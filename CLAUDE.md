@@ -48,6 +48,8 @@ Flujo: **view (`presentation/`) → servicio (`application/services/`) → model
 - Las views son finas: reciben la petición, validan con el Form, llaman al servicio y renderizan la plantilla o devuelven JSON.
 - **DTO**: el Django Form hace de DTO de entrada. En `application/dto/` solo van `@dataclass` sencillas para lecturas ricas (joins, por ejemplo `ErreserbaInfoDto`), y solo cuando un caso de uso lo necesite. No crear un DTO si basta con un parámetro simple.
 - Plantillas: un único `base.html` (menú Bootstrap condicional según público/rol) y carpetas `ikaslea/`, `irakaslea/` y `sukaldea/`.
+- **Dashboard según el rol, no según `egoiliarra`**: IKASLEA → dashboard de IKASLEA (sea residente o no); IRAKASLEA → el suyo; SUKALDEA → el suyo.
+- **Menú de IKASLEA**: un bloque IKASLEA con los enlaces comunes (Menua, Ordainketak) y, dentro, `{% if user.ikaslea.egoiliarra %}` para lo excluyente: el residente ve su IkasturtekoErreserba (UC20); el no residente ve las reservas puntuales (UC08–UC10).
 - Control de acceso por rol: con decoradores en las views (el equivalente al middleware de rol de Laravel).
 
 ### Estructura de carpetas
@@ -145,7 +147,7 @@ Enumeraciones:
 
 ### Casos de uso web
 - **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil (incluye la preferencia de menú vegano), UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado).
-- **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (carga el dashboard de IRAKASLEA), UC07 logout, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
+- **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (el IKASLEA no residente carga el dashboard de IKASLEA; el IRAKASLEA, el de IRAKASLEA), UC07 logout, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
 - **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout.
 - UC13 y UC14 comparten la lógica de cálculo de comensales: UC13 la aplica a hoy, en el dashboard; UC14 a cualquier fecha, con un selector (widget de jQuery), en su propia página.
 
