@@ -6,7 +6,7 @@
 ## Objetivo y alcance
 Proyecto educativo: migrar la aplicación web Ikastetxeko Jangela (comedor de un centro educativo) de Laravel/PHP a Python/Django.
 Debe cumplir las rúbricas de evaluación (`docs-internos/ebaluazioa.md`).
-Se mantienen los requisitos y los casos de uso web documentados (UC01–UC19). **No inventar flujos, requisitos, entidades, reglas, tablas ni APIs que no estén documentados.**
+Se mantienen los requisitos y los casos de uso web documentados (UC01–UC20). **No inventar flujos, requisitos, entidades, reglas, tablas ni APIs que no estén documentados.**
 
 ## Tecnologías
 - Python + Django; MySQL 8.4.
@@ -144,7 +144,7 @@ Enumeraciones:
 21. Al cancelar una reserva puntual (UC09), su `Erreserba` pasa a `EZEZTATUA` y se elimina el `Ordainketa` asociado (dentro de `transaction.atomic()`). En el MVP ese pago siempre está en `ORDAINTZEKE` (regla 20).
 
 ### Casos de uso web
-- **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil (incluye la preferencia de menú vegano), UC04 consultar pagos, UC05 consultar menú (estándar y vegano).
+- **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil (incluye la preferencia de menú vegano), UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado).
 - **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (carga el dashboard de IRAKASLEA), UC07 logout, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
 - **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout.
 - UC13 y UC14 comparten la lógica de cálculo de comensales: UC13 la aplica a hoy, en el dashboard; UC14 a cualquier fecha, con un selector (widget de jQuery), en su propia página.
