@@ -1,0 +1,4 @@
+mysqlclient
+cryptography
+Django
+python-dotenv

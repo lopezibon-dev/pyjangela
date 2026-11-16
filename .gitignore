@@ -1,0 +1,58 @@
+# --- Proiektua ---
+# Barne-dokumentazioa (ez da Git-era igotzen)
+docs-internos/
+# Karpeta-egitura birsortzeko script lokala
+web/jangela.bat
+
+# --- Ingurune aldagaiak (sekretuak) ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Ingurune birtualak
+.venv/
+venv/
+env/
+ENV/
+
+# Testak eta estaldura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# --- Django ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/web/staticfiles/
+/web/media/
+
+# --- IDE-ak ---
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# --- Sistema eta fitxategi denboralak ---
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*.swp
