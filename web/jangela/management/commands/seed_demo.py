@@ -1,12 +1,17 @@
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
+from jangela.domain.enums.otordu_mota import OtorduMota
 from jangela.domain.enums.rola import Rola
 from jangela.models import (
     ErabiltzaileaModel,
     ErreserbaModel,
     IkasleaModel,
     IkasturtekoErreserbaModel,
+    MenuaModel,
     OrdainketaModel,
 )
 
@@ -29,6 +34,29 @@ ERABILTZAILEAK = [
 ]
 
 
+# Demo-menuak: gaur-3 egunetik gaur+7 egunera, otordu mota guztiekin.
+MENU_EGUNAK = range(-3, 8)
+# (deskribapena, aukera_beganoa). None -> beganoa = deskribapena (17. araua)
+MENUAK = {
+    OtorduMota.GOSARIA: [
+        ("Ogi txigortua tomatearekin eta olioarekin, fruta", None),
+        ("Jogurta, muesli-a eta laranja-zukua", "Soja-jogurta, muesli-a eta laranja-zukua"),
+        ("Kafesnea, gailetak eta sagarra", "Oloa-esnea, gailetak eta sagarra"),
+    ],
+    OtorduMota.BAZKARIA: [
+        ("Dilista-zopa eta oilaskoa piperrekin", "Dilista-zopa eta tofua piperrekin"),
+        ("Entsalada mistoa eta legatza saltsa berdean", "Entsalada mistoa eta garbantzu-hanburgesa"),
+        ("Makarroiak tomatearekin eta txerri-xerra", "Makarroiak tomatearekin eta seitan-xerra"),
+        ("Barazki-paella eta fruta", None),
+    ],
+    OtorduMota.AFARIA: [
+        ("Barazki-krema eta tortilla", "Barazki-krema eta barazki-salteatua"),
+        ("Porrusalda eta bakailaoa", "Porrusalda eta onddo-xerrak"),
+        ("Arroz-entsalada eta fruta", None),
+    ],
+}
+
+
 class Command(BaseCommand):
     help = "Demo-datuak ezabatu eta berriro sortzen ditu (idenpotentea)."
 
@@ -36,9 +64,11 @@ class Command(BaseCommand):
         with transaction.atomic():
             self.ezabatu()
             self.sortu()
+            menu_kopurua = self.menuak_sortu()
         self.stdout.write(self.style.SUCCESS(
             f"{len(ERABILTZAILEAK)} demo-erabiltzaile sortuta (pasahitza: {PASAHITZA})."
         ))
+        self.stdout.write(self.style.SUCCESS(f"{menu_kopurua} demo-menu sortuta."))
 
     def ezabatu(self):
         """Demo-erabiltzaileak eta haien datuak ezabatu (beste erabiltzaileak ez)."""
@@ -68,3 +98,21 @@ class Command(BaseCommand):
                 IkasleaModel.objects.create(
                     erabiltzailea=erabiltzailea, egoiliarra=datuak["egoiliarra"]
                 )
+
+    def menuak_sortu(self) -> int:
+        """Demo-tarteko menuak ezabatu eta berriro sortu (tartetik kanpokoak ez)."""
+        gaur = timezone.localdate()
+        egunak = [gaur + timedelta(days=n) for n in MENU_EGUNAK]
+        MenuaModel.objects.filter(menua_data__range=(egunak[0], egunak[-1])).delete()
+        menuak = []
+        for i, eguna in enumerate(egunak):
+            for mota, aukerak in MENUAK.items():
+                deskribapena, beganoa = aukerak[i % len(aukerak)]
+                menuak.append(MenuaModel(
+                    menua_data=eguna,
+                    otordu_mota=mota.value,
+                    deskribapena=deskribapena,
+                    aukera_beganoa=beganoa or deskribapena,
+                ))
+        MenuaModel.objects.bulk_create(menuak)
+        return len(menuak)
