@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Menua ezabatu · Jangela{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">Menua ezabatu</h1>
+        <p>Ziur zaude menu hau ezabatu nahi duzula?</p>
+        {# XSS saihestu: autoescape / ihes egitea #}
+        <dl>
+            <dt>Data</dt><dd>{{ menua.menua_data|date:"Y-m-d" }}</dd>
+            <dt>Otordu mota</dt><dd>{{ menua.get_otordu_mota_display }}</dd>
+            <dt>Deskribapena</dt><dd>{{ menua.deskribapena|linebreaksbr }}</dd>
+            <dt>Aukera beganoa</dt><dd>{{ menua.aukera_beganoa|linebreaksbr }}</dd>
+        </dl>
+        {# Ezabatzea POST bidez soilik (CSRF tokenarekin), inoiz ez GET bidez #}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Bai, ezabatu</button>
+            <a class="btn btn-link" href="{% url 'menuak' %}">Utzi</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

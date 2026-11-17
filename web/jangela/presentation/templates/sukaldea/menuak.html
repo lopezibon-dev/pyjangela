@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Menuak · Jangela{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Menuak</h1>
+    <a class="btn btn-primary" href="{% url 'menua_sortu' %}">Menua sortu</a>
+</div>
+
+{% if menuak %}
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Otordu mota</th>
+                <th>Deskribapena</th>
+                <th>Aukera beganoa</th>
+                <th class="text-end">Ekintzak</th>
+            </tr>
+        </thead>
+        <tbody>
+            {# XSS saihestu: autoescape / ihes egitea (deskribapenetako HTML testu gisa) #}
+            {% for menua in menuak %}
+            <tr>
+                <td class="text-nowrap">{{ menua.menua_data|date:"Y-m-d" }}</td>
+                <td>{{ menua.get_otordu_mota_display }}</td>
+                <td>{{ menua.deskribapena|linebreaksbr }}</td>
+                <td>{{ menua.aukera_beganoa|linebreaksbr }}</td>
+                <td class="text-end text-nowrap">
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'menua_editatu' menua.pk %}">Editatu</a>
+                    <a class="btn btn-sm btn-outline-danger" href="{% url 'menua_ezabatu' menua.pk %}">Ezabatu</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">Ez dago menurik.</p>
+{% endif %}
+{% endblock %}

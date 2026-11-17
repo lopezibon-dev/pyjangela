@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ izenburua }} · Jangela{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="h3 mb-3">{{ izenburua }}</h1>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {# Erroreen kudeaketa: formularioaren erroreak ikusgai #}
+            {# XSS saihestu: autoescape / ihes egitea #}
+            {% for errorea in form.non_field_errors %}
+            <div class="alert alert-danger">{{ errorea }}</div>
+            {% endfor %}
+            {% for eremua in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ eremua.id_for_label }}">{{ eremua.label }}</label>
+                {{ eremua }}
+                {% for errorea in eremua.errors %}
+                <div class="text-danger small">{{ errorea }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Gorde</button>
+            <a class="btn btn-link" href="{% url 'menuak' %}">Utzi</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
