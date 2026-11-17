@@ -49,7 +49,8 @@ Flujo: **view (`presentation/`) → servicio (`application/services/`) → model
 - **DTO**: el Django Form hace de DTO de entrada. En `application/dto/` solo van `@dataclass` sencillas para lecturas ricas (joins, por ejemplo `ErreserbaInfoDto`), y solo cuando un caso de uso lo necesite. No crear un DTO si basta con un parámetro simple.
 - Plantillas: un único `base.html` (menú Bootstrap condicional según público/rol) y carpetas `ikaslea/`, `irakaslea/` y `sukaldea/`.
 - **Dashboard según el rol, no según `egoiliarra`**: IKASLEA → dashboard de IKASLEA (sea residente o no); IRAKASLEA → el suyo; SUKALDEA → el suyo.
-- **Menú de IKASLEA**: un bloque IKASLEA con los enlaces comunes (Menua, Ordainketak) y, dentro, `{% if user.ikaslea.egoiliarra %}` para lo excluyente: el residente ve su IkasturtekoErreserba (UC20); el no residente ve las reservas puntuales (UC08–UC10).
+- **Profila (UC03)**: enlace en el menú de todos los roles; la misma página para todos.
+- **Menú de IKASLEA**: un bloque IKASLEA con los enlaces comunes (Menua, Ordainketak, Profila) y, dentro, `{% if user.ikaslea.egoiliarra %}` para lo excluyente: el residente ve su IkasturtekoErreserba (UC20); el no residente ve las reservas puntuales (UC08–UC10).
 - Control de acceso por rol: con decoradores en las views (el equivalente al middleware de rol de Laravel).
 
 ### Estructura de carpetas
@@ -107,6 +108,7 @@ pyjangela/                 # Git-en erroa
 - `UrtekoErreserba` se renombró a `IkasturtekoErreserba`: es una reserva permanente para todo el curso (ni mensual ni semanal). El cobro está en `Ordainketa`.
 - Settings: `TIME_ZONE = "Europe/Madrid"`, `USE_TZ = True`, `LANGUAGE_CODE = "eu"`.
 - El admin de Django no aplica las reglas de dominio: es una herramienta de desarrollo.
+- **Parámetros de negocio** (horas límite, precios): constantes en `settings.py`, no en la BD (no hay entidad de configuración).
 
 ## Dominio
 Entidades: `Erabiltzailea`, `Ikaslea`, `IkasturtekoErreserba`, `Erreserba`, `Ordainketa`, `Menua`.
@@ -127,8 +129,8 @@ Enumeraciones:
 2. Cada usuario tiene un único rol.
 3. Un usuario con rol `IKASLEA` tiene un registro `Ikaslea`; los demás roles no.
 4. Solo los estudiantes residentes (`egoiliarra = true`) pueden tener `IkasturtekoErreserba`.
-5. Una reserva se crea o se cancela al menos 24 horas antes de la hora límite del tipo de comida. Las horas límite son parámetros configurados por la administración.
-6. Comensales del día = reservas anuales aplicables + reservas puntuales activas.
+5. Una reserva se crea o se cancela al menos 24 horas antes de la hora límite del tipo de comida. Las horas límite son parámetros configurados por la administración, en `settings.py` (`ORDU_MUGAK`: `GOSARIA` 08:00, `BAZKARIA` 13:00, `AFARIA` 20:00).
+6. Comensales del día = reservas anuales aplicables + reservas puntuales activas. Solo cuentan los usuarios activos (`aktiboa = true`): los inactivos ya no participan en el centro.
 7. Todo pago pertenece a un usuario.
 8. `ALDIZKAKOA` requiere `erreserba_id`; `HILEKOA` no requiere reserva (`erreserba_id = NULL`).
 9. `ORDAINDUTA` requiere fecha de pago; `ORDAINTZEKE` requiere que la fecha de pago sea nula.
@@ -140,15 +142,17 @@ Enumeraciones:
 15. La vigencia de `IkasturtekoErreserba` es implícita (por ejemplo, el curso de septiembre a junio). No hay campo de año ni histórico.
 16. Los usuarios pueden indicar su preferencia por el menú vegano con `Erabiltzailea.beganoa` (booleano), sea cual sea su rol.
 17. Cada `Menua` tiene `deskribapena` (menú estándar) y `aukera_beganoa` (menú vegano). Las dos son obligatorias y siempre tienen texto; `aukera_beganoa` puede coincidir con `deskribapena`.
-18. UC14 muestra, por día y `OtorduMota`, el total de comensales y cuántos tienen preferencia vegana. Es la suma de las reservas puntuales activas (vía `Erabiltzailea.beganoa`) y las reservas anuales aplicables (vía `Ikaslea` → `Erabiltzailea.beganoa`). UC13 reutiliza el mismo cálculo para la fecha de hoy.
+18. UC14 muestra, por día y `OtorduMota`, el total de comensales y cuántos tienen preferencia vegana. Es la suma de las reservas puntuales activas (vía `Erabiltzailea.beganoa`) y las reservas anuales aplicables (vía `Ikaslea` → `Erabiltzailea.beganoa`). Solo usuarios activos (regla 6). UC13 reutiliza el mismo cálculo para la fecha de hoy.
 19. Un `Erabiltzailea` con `aktiboa = false` no puede iniciar sesión.
-20. Procesar pagos queda fuera del MVP: al crear una reserva se genera un `Ordainketa` en estado `ORDAINTZEKE`; el paso a `ORDAINDUTA` no se detalla.
+20. Procesar pagos queda fuera del MVP: al crear una reserva se genera un `Ordainketa` `ALDIZKAKOA` en estado `ORDAINTZEKE`; el paso a `ORDAINDUTA` no se detalla. El importe sale del precio del tipo de comida, en `settings.py` (`PREZIOAK`: `GOSARIA` 4,00 €, `BAZKARIA` 8,00 €, `AFARIA` 8,00 €).
 21. Al cancelar una reserva puntual (UC09), su `Erreserba` pasa a `EZEZTATUA` y se elimina el `Ordainketa` asociado (dentro de `transaction.atomic()`). En el MVP ese pago siempre está en `ORDAINTZEKE` (regla 20).
+22. Un usuario no puede tener dos reservas puntuales `AKTIBOA` para la misma fecha y `OtorduMota` (sí puede volver a reservar una que canceló). Se comprueba dos veces: en el servicio (mensaje claro al usuario) y en la BD con una restricción única, como guarda final (también ante peticiones simultáneas).
 
 ### Casos de uso web
-- **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil (incluye la preferencia de menú vegano), UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado).
-- **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (el IKASLEA no residente carga el dashboard de IKASLEA; el IRAKASLEA, el de IRAKASLEA), UC07 logout, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
-- **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout.
+- **Todos los roles**: UC03 ver perfil (la misma página para todos; incluye la preferencia de menú vegano). Solo lectura.
+- **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil, UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado). Si todavía no tiene `IkasturtekoErreserba`, el formulario sale con todos los campos marcados por defecto y el registro se crea al guardar.
+- **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (el IKASLEA no residente carga el dashboard de IKASLEA; el IRAKASLEA, el de IRAKASLEA), UC07 logout, UC03 ver perfil, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
+- **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout, UC03 ver perfil.
 - UC13 y UC14 comparten la lógica de cálculo de comensales: UC13 la aplica a hoy, en el dashboard; UC14 a cualquier fecha, con un selector (widget de jQuery), en su propia página.
 
 ## Validación (aplicar en todos los issues)
