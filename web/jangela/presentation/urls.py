@@ -22,4 +22,9 @@ urlpatterns = [
     path("ikaslea/dashboard/", views.ikaslea_dashboard, name="ikaslea_dashboard"),
     path("irakaslea/dashboard/", views.irakaslea_dashboard, name="irakaslea_dashboard"),
     path("sukaldea/dashboard/", views.sukaldea_dashboard, name="sukaldea_dashboard"),
+    # Menuen CRUDa (UC15–UC17)
+    path("sukaldea/menuak/", views.menuak, name="menuak"),
+    path("sukaldea/menuak/sortu/", views.menua_sortu, name="menua_sortu"),
+    path("sukaldea/menuak/<int:pk>/editatu/", views.menua_editatu, name="menua_editatu"),
+    path("sukaldea/menuak/<int:pk>/ezabatu/", views.menua_ezabatu, name="menua_ezabatu"),
 ]
