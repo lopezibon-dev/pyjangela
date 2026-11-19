@@ -18,7 +18,7 @@ Se mantienen los requisitos y los casos de uso web documentados (UC01–UC20). *
 - Desarrollo: sin Docker. `runserver`, MySQL local y Python local. Sin Apache ni XAMPP.
 - Producción/MVP (más adelante): Docker Compose con dos contenedores, `web` (Apache + mod_wsgi + Django) y `db` (MySQL 8). No usar Gunicorn. `DB_HOST=db` en Docker y `localhost` en local.
 - CI con GitHub Actions: previsto, sin definir todavía.
-- Gestión: GitHub Projects (Kanban) + issues. El diagrama de Gantt (Mermaid) se generará al final, a partir de los issues reales.
+- Gestión: GitHub Projects (Kanban) + issues. El diagrama de Gantt (Mermaid, `docs/garapen-plana-gantt.md`, + versión PNG) es una estimación por milestones e issues; no tiene por qué cumplirse. Al final se puede añadir en el mismo documento la comparación con lo real. El estado del desarrollo se sigue en los issues del Project (sin fechas) y en `egoera.md`.
 
 ## Principios de trabajo
 - **Sin overengineering**: usar la solución más simple que funcione. Prioridad: claridad educativa y rapidez de desarrollo.
