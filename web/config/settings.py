@@ -133,6 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+# CLAUDE.md: static/ presentation/ barruan dago (ez jangela/static/)
+STATICFILES_DIRS = [BASE_DIR / 'jangela' / 'presentation' / 'static']
 
 
 # Email

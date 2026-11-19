@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Menua · Jangela{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Menua</h1>
+
+{# Data aukeratu: datepicker-a + aurreko/hurrengo eguna #}
+<div class="input-group mb-3" style="max-width: 20rem;">
+    <button type="button" class="btn btn-outline-secondary" id="aurrekoa" aria-label="Aurreko eguna">&larr;</button>
+    <input type="text" class="form-control text-center datepicker" id="menua_data"
+           value="{{ data|date:'Y-m-d' }}" autocomplete="off" aria-label="Data (UUUU-HH-EE)"
+           data-url="{% url 'menua_json' %}">
+    <button type="button" class="btn btn-outline-secondary" id="hurrengoa" aria-label="Hurrengo eguna">&rarr;</button>
+</div>
+
+{# Erroreak eta egoera-mezuak (menua.js-k textContent bidez betetzen ditu) #}
+<div id="errorea" class="alert alert-danger d-none" role="alert"></div>
+<div id="kargatzen" class="text-muted mb-2 d-none">Kargatzen...</div>
+<div id="menurik-ez" class="alert alert-info{% if menuak.GOSARIA or menuak.BAZKARIA or menuak.AFARIA %} d-none{% endif %}">
+    Ez dago menurik egun honetarako.
+</div>
+
+{# XSS saihestu: autoescape (Django txantiloiak) #}
+<div class="row g-3" id="menuak">
+    {# Txartel bera hiru otorduetarako (17. araua: estandarra + beganoa) #}
+    {% include "menua_txartela.html" with id="gosaria" izena="Gosaria" menua=menuak.GOSARIA %}
+    {% include "menua_txartela.html" with id="bazkaria" izena="Bazkaria" menua=menuak.BAZKARIA %}
+    {% include "menua_txartela.html" with id="afaria" izena="Afaria" menua=menuak.AFARIA %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{# jQuery eta jQuery UI (datepicker-a) orri honetan soilik #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.3/dist/themes/base/jquery-ui.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.3/dist/jquery-ui.min.js"></script>
+<script src="{% static 'js/menua.js' %}"></script>
+{% endblock %}

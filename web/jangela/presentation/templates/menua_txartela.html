@@ -1,0 +1,13 @@
+{# Otordu baten txartela (menua.html-k erabiltzen du; menua.js-k eguneratzen du) #}
+<div class="col-12 col-md-4">
+    <div class="card h-100" id="{{ id }}">
+        <div class="card-header fw-semibold">{{ izena }}</div>
+        <div class="card-body">
+            <p class="card-text deskribapena">{% if menua %}{{ menua.deskribapena }}{% else %}Ez dago menurik{% endif %}</p>
+            <p class="card-text small text-success mb-0">
+                <span class="fw-semibold">Aukera beganoa:</span>
+                <span class="beganoa">{% if menua %}{{ menua.aukera_beganoa }}{% else %}-{% endif %}</span>
+            </p>
+        </div>
+    </div>
+</div>
