@@ -28,6 +28,17 @@ class MenuaService:
         return MenuaModel.objects.order_by("menua_data", ordena)
 
     @staticmethod
+    def lortuEgunekoMenuak(data: date) -> dict:
+        """UC05/UC11: egun bateko menuak, otordu motaren arabera.
+
+        {"GOSARIA": MenuaModel|None, "BAZKARIA": ..., "AFARIA": ...} (enum-aren ordenan).
+        """
+        # SQL injection saihestu: ORM / parametrizazioa
+        menuak = {menua.otordu_mota: menua
+                  for menua in MenuaModel.objects.filter(menua_data=data)}
+        return {mota.value: menuak.get(mota.value) for mota in OtorduMota}
+
+    @staticmethod
     def lortu(pk: int) -> MenuaModel:
         """Menua id-aren arabera; ez badago, 404."""
         # Erroreen kudeaketa: menurik ez -> 404

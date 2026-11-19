@@ -27,4 +27,7 @@ urlpatterns = [
     path("sukaldea/menuak/sortu/", views.menua_sortu, name="menua_sortu"),
     path("sukaldea/menuak/<int:pk>/editatu/", views.menua_editatu, name="menua_editatu"),
     path("sukaldea/menuak/<int:pk>/ezabatu/", views.menua_ezabatu, name="menua_ezabatu"),
+    # Menua kontsultatu (UC05/UC11): rol guztiak
+    path("menua/", views.menua_kontsultatu, name="menua"),
+    path("menua/json/", views.menua_json, name="menua_json"),
 ]
