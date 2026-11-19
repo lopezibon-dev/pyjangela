@@ -50,6 +50,8 @@ Flujo: **view (`presentation/`) → servicio (`application/services/`) → model
 - Plantillas: un único `base.html` (menú Bootstrap condicional según público/rol) y carpetas `ikaslea/`, `irakaslea/` y `sukaldea/`.
 - **Dashboard según el rol, no según `egoiliarra`**: IKASLEA → dashboard de IKASLEA (sea residente o no); IRAKASLEA → el suyo; SUKALDEA → el suyo.
 - **Profila (UC03)**: enlace en el menú de todos los roles; la misma página para todos.
+- **Menua (UC05/UC11)**: enlace "Menua" en el menú de todos los roles; la misma página de consulta para todos (SUKALDEA también, además de su CRUD "Menuak").
+- `rola_behar(*rolak)` acepta uno o varios roles.
 - **Menú de IKASLEA**: un bloque IKASLEA con los enlaces comunes (Menua, Ordainketak, Profila) y, dentro, `{% if user.ikaslea.egoiliarra %}` para lo excluyente: el residente ve su IkasturtekoErreserba (UC20); el no residente ve las reservas puntuales (UC08–UC10).
 - Control de acceso por rol: con decoradores en las views (el equivalente al middleware de rol de Laravel).
 
@@ -150,6 +152,7 @@ Enumeraciones:
 
 ### Casos de uso web
 - **Todos los roles**: UC03 ver perfil (la misma página para todos; incluye la preferencia de menú vegano). Solo lectura.
+- **Consultar menú (UC05/UC11)**: una sola página de solo lectura (`/menua/`, datepicker + `fetch`) para todos los roles: IKASLEA, IRAKASLEA y también SUKALDEA. Sin sesión no se entra.
 - **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil, UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado). Si todavía no tiene `IkasturtekoErreserba`, el formulario sale con todos los campos marcados por defecto y el registro se crea al guardar.
 - **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (el IKASLEA no residente carga el dashboard de IKASLEA; el IRAKASLEA, el de IRAKASLEA), UC07 logout, UC03 ver perfil, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
 - **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout, UC03 ver perfil.
