@@ -1,7 +1,12 @@
+from datetime import date
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms.models import model_to_dict
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_GET
 
 from jangela.application.services.menua_service import MenuaBikoiztutaError, MenuaService
 from jangela.domain.enums.rola import Rola
@@ -103,3 +108,37 @@ def menua_ezabatu(request, pk):
         messages.success(request, "Menua ezabatu da.")
         return redirect("menuak")
     return render(request, "sukaldea/menua_ezabatu.html", {"menua": menua})
+
+
+# --- Menua kontsultatu (UC05/UC11): rol guztiak, irakurketa soilik ---
+
+@rola_behar(Rola.IKASLEA, Rola.IRAKASLEA, Rola.SUKALDEA)
+def menua_kontsultatu(request):
+    """UC05/UC11: orria gaurko menuekin; beste datak menua.js-k kargatzen ditu (fetch)."""
+    gaur = timezone.localdate()
+    return render(request, "menua.html", {
+        "data": gaur,
+        "menuak": MenuaService.lortuEgunekoMenuak(gaur),
+    })
+
+
+@require_GET
+@rola_behar(Rola.IKASLEA, Rola.IRAKASLEA, Rola.SUKALDEA)
+def menua_json(request):
+    """UC05/UC11: data bateko menuak JSON formatuan (?data=UUUU-HH-EE)."""
+    # Sarreren balidazioa: data parametroa esplizituki (formatu okerra -> 400)
+    try:
+        data = date.fromisoformat(request.GET.get("data", ""))
+    except ValueError:
+        return JsonResponse({"errorea": "Data okerra: erabili UUUU-HH-EE formatua."}, status=400)
+
+    menuak = MenuaService.lortuEgunekoMenuak(data)
+    return JsonResponse({
+        "data": data.isoformat(),
+        # 17. araua: menu estandarra eta beganoa; null -> menurik ez
+        "menuak": {
+            mota: {"deskribapena": menua.deskribapena, "aukera_beganoa": menua.aukera_beganoa}
+            if menua else None
+            for mota, menua in menuak.items()
+        },
+    })
