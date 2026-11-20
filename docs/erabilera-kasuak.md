@@ -60,7 +60,7 @@ erabakitzen du erreserba mota: egoiliarrak ikasturteko erreserba du, eta ez-egoi
 | UC | Izena | Oharrak | Issue |
 |---|---|---|---|
 | UC18 / UC19 | Saioa hasi / itxi | SUKALDEA dashboard-a kargatzen du | [#6](https://github.com/lopezibon-dev/pyjangela/issues/6) |
-| UC13 | Gaurko komensalak | Dashboard-ean: guztira eta beganoak, otordu motaren arabera | [#16](https://github.com/lopezibon-dev/pyjangela/issues/16) |
+| UC13 | Gaurko komensalak | Dashboard-ean (`/sukaldea/dashboard/`): guztira eta beganoak, otordu motaren arabera | [#16](https://github.com/lopezibon-dev/pyjangela/issues/16) |
 | UC14 | Hurrengo egunetako estatistikak | `/sukaldea/estatistikak`, data-hautatzailearekin. UC13-ren kalkulu bera | [#16](https://github.com/lopezibon-dev/pyjangela/issues/16) |
 | UC15 | Menua sortu | Deskribapen estandarra eta beganoa, biak derrigorrezkoak | [#11](https://github.com/lopezibon-dev/pyjangela/issues/11) |
 | UC16 | Menua eguneratu | Berdin | [#11](https://github.com/lopezibon-dev/pyjangela/issues/11) |
