@@ -123,8 +123,7 @@ Enumeraciones:
 - `OrdainketaMota`: `HILEKOA`, `ALDIZKAKOA`.
 
 ### Relaciones
-`Erabiltzailea`–`Ikaslea`; `Ikaslea`–`IkasturtekoErreserba`; `Erabiltzailea`–`Erreserba`; `Erabiltzailea`–`Ordainketa`; `Erreserba`–`Ordainketa`. `Menua` no tiene ninguna relación directa.
-`Ikaslea`–`IkasturtekoErreserba` es 1:0..1: opcional desde `Ikaslea` y obligatoria desde `IkasturtekoErreserba` (en Mermaid: `||--o|`).
+Diagrama UML con atributos y cardinalidades: `docs/uml-diagrama.md`.
 
 ### Reglas de negocio
 1. Email único; las contraseñas se guardan como hash.
@@ -151,12 +150,11 @@ Enumeraciones:
 22. Un usuario no puede tener dos reservas puntuales `AKTIBOA` para la misma fecha y `OtorduMota` (sí puede volver a reservar una que canceló). Se comprueba dos veces: en el servicio (mensaje claro al usuario) y en la BD con una restricción única, como guarda final (también ante peticiones simultáneas).
 
 ### Casos de uso web
-- **Todos los roles**: UC03 ver perfil (la misma página para todos; incluye la preferencia de menú vegano). Solo lectura.
-- **Consultar menú (UC05/UC11)**: una sola página de solo lectura (`/menua/`, datepicker + `fetch`) para todos los roles: IKASLEA, IRAKASLEA y también SUKALDEA. Sin sesión no se entra.
-- **Estudiantes residentes**: UC01 login (carga el dashboard de IKASLEA), UC02 logout, UC03 ver perfil, UC04 consultar pagos, UC05 consultar menú (estándar y vegano), UC20 ver y editar su `IkasturtekoErreserba` (reglas 12–15: 10 booleanos, sin plazo ni versionado). Si todavía no tiene `IkasturtekoErreserba`, el formulario sale con todos los campos marcados por defecto y el registro se crea al guardar.
-- **Otros usuarios** (estudiantes no residentes / profesores): UC06 login (el IKASLEA no residente carga el dashboard de IKASLEA; el IRAKASLEA, el de IRAKASLEA), UC07 logout, UC03 ver perfil, UC08 crear reserva, UC09 cancelar reserva, UC10 ver mis reservas, UC11 consultar menú (estándar y vegano), UC12 consultar pagos.
-- **Personal de cocina**: UC13 ver comensales del día (dashboard: `/sukaldea/dashboard`), UC14 ver estadísticas de los próximos días (`/sukaldea/estatistikak`, con selector de fecha), UC15 crear menú (descripción estándar y vegana, las dos obligatorias), UC16 actualizar menú (ídem), UC17 eliminar menú, UC18 login (carga el dashboard de SUKALDEA), UC19 logout, UC03 ver perfil.
-- UC13 y UC14 comparten la lógica de cálculo de comensales: UC13 la aplica a hoy, en el dashboard; UC14 a cualquier fecha, con un selector (widget de jQuery), en su propia página.
+Lista por rol, con URLs e issues: `docs/erabilera-kasuak.md`.
+- UC13 y UC14 comparten el cálculo de comensales: UC13 lo aplica a hoy, en el dashboard; UC14 a cualquier fecha, con un selector (widget de jQuery), en su propia página.
+
+## Documentación (`docs/`)
+Índice en `docs/README.md` (arquitectura, UML, casos de uso, seguridad, instalación, Gantt). Si cambia un caso de uso, el modelo o una medida de seguridad, actualizar también el documento correspondiente de `docs/`.
 
 ## Validación (aplicar en todos los issues)
 - **Entrada**: usar Django Forms, o validación explícita en las views que devuelven JSON. Las plantillas usan autoescape: no usar nunca `|safe` con datos del usuario. Las llamadas con `fetch` también envían el token CSRF (cabecera `X-CSRFToken`).
