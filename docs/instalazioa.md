@@ -117,13 +117,14 @@ flowchart LR
 3. Irudia eraiki eta edukiontziak abiarazi (lehen aldian minutu batzuk behar ditu):
 
    ```bash
-   docker compose up --build -d
+   docker compose up --build
    ```
 
    `web` edukiontzia `db` prest dagoenean abiarazten da eta `migrate` automatikoki exekutatzen du.
    Fitxategi estatikoak irudia eraikitzean biltzen dira (`collectstatic`).
+   Itxaron log-etan `Applying sessions.0001_initial... OK` (azken migrazioa) agertu arte.
 
-4. Demo-datuak sortu (eskuz; datuak ezabatu eta berriro sortzen ditu):
+4. Beste terminal batean, demo-datuak sortu (eskuz; datuak ezabatu eta berriro sortzen ditu):
 
    ```bash
    docker compose exec web python manage.py seed_demo
@@ -132,11 +133,10 @@ flowchart LR
 5. Ireki <http://localhost:8080> eta hasi saioa demo-erabiltzaile batekin
    (adibidez `david@jangela.eus`, pasahitza `1234`).
 
-6. Gelditu edo dena ezabatu:
+6. Gelditu edo dena ezabatu (`Ctrl+C` 3. urratseko terminalean, eta gero):
 
    ```bash
-   docker compose logs web    # web edukiontziaren log-ak ikusi
-   docker compose down        # gelditu (datuak bolumenean geratzen dira)
+   docker compose down        # edukiontziak ezabatu (datuak bolumenean geratzen dira)
    docker compose down -v     # gelditu eta datu-basearen bolumena ere ezabatu
    ```
 
@@ -151,7 +151,7 @@ flowchart LR
 2. Irudia berreraiki eta abiarazi:
 
    ```bash
-   docker compose up --build -d
+   docker compose up --build
    ```
 
    Horrek fitxategi estatikoak berriro biltzen ditu eta, abiaraztean, migrazio berriak aplikatzen ditu.
