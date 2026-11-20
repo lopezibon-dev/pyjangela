@@ -1,0 +1,25 @@
+# Ekoizpena / MVP: bi edukiontzi, web (Apache + mod_wsgi + Django) eta db (MySQL 8.4)
+services:
+  db:
+    image: mysql:8.4
+    env_file: .env.docker          # MYSQL_* aldagaiak
+    volumes:
+      - db_data:/var/lib/mysql      # datuak berrabiaraztean mantentzen dira
+    healthcheck:
+      # 127.0.0.1 (TCP): hasieratze-zerbitzari tenporalak ez du erantzuten, benetakoak bai
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: ./web
+    env_file: .env.docker          # Django aldagaiak (DB_HOST=db, DEBUG=False...)
+    ports:
+      - "8080:80"                   # http://localhost:8080 (8000 garapenerako libre)
+    depends_on:
+      db:
+        condition: service_healthy  # MySQL prest dagoenean bakarrik abiarazi
+
+volumes:
+  db_data:
