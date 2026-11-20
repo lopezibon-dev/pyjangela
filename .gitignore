@@ -56,3 +56,6 @@ Thumbs.db
 *.tmp
 *.temp
 *.swp
+
+# --- Claude Code ---
+.claude/
