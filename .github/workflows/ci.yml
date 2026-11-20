@@ -1,0 +1,37 @@
+# CI sinplea: mendekotasunak instalatu eta Django proiektua egiaztatu
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  egiaztatu:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web   # manage.py eta requirements.txt hemen daude
+
+    # .env ez dago Git-en: balio faltsuak (ez da DBra konektatzen)
+    env:
+      SECRET_KEY: ci-gako-faltsua
+      DEBUG: "False"
+      DB_HOST: localhost
+      DB_PORT: "3306"
+      DB_NAME: jangela
+      DB_USER: ci
+      DB_PASSWORD: ci
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"   # lokaleko bertsio bera (Django 6-k Python 3.12+ behar du)
+
+      - name: Mendekotasunak instalatu
+        run: pip install -r requirements.txt
+
+      - name: Django egiaztatu
+        run: python manage.py check
