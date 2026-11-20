@@ -1,0 +1,8 @@
+# Irudira ez kopiatu: sekretuak, ingurune lokala eta sortutako fitxategiak
+.env
+.env.*
+.venv/
+__pycache__/
+*.py[cod]
+staticfiles/
+jangela.bat
