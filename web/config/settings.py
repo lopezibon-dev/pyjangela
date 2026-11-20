@@ -32,7 +32,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+# Baimendutako ostalariak .env-etik, komaz bereizita (hutsik: [] -> DEBUG=True-rekin localhost)
+ALLOWED_HOSTS = [h for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h]
 
 
 # Application definition
@@ -135,6 +136,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 # CLAUDE.md: static/ presentation/ barruan dago (ez jangela/static/)
 STATICFILES_DIRS = [BASE_DIR / 'jangela' / 'presentation' / 'static']
+# Ekoizpena (Docker): collectstatic-ek hemen biltzen ditu eta Apache-k zerbitzatzen ditu
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Email
